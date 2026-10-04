@@ -1,0 +1,24 @@
+name: Build TwoSix 2.3 32-bit Legacy ISO
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build i386 ISO on Debian 12
+        run: |
+          sudo docker run --privileged --rm \
+            -v "$PWD:/work" -w /work debian:12-slim bash -lc '
+              apt-get update &&
+              DEBIAN_FRONTEND=noninteractive apt-get install -y \
+                live-build debootstrap squashfs-tools xorriso isolinux syslinux-common \
+                mtools dosfstools ca-certificates &&
+              ./build.sh
+            '
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TwoSix-2.3-Live-32bit-i386-Legacy
+          path: |
+            TwoSix-2.3-Live-32bit-i386-Legacy.iso
+            TwoSix-2.3-Live-32bit-i386-Legacy.iso.sha256
